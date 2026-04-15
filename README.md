@@ -1,4 +1,57 @@
-# Genkit Recipe Generator - Setup Guide
+# Genkit Recipe Generator & Next.js Chat App
+
+This repository contains two main components:
+
+1. **Genkit Recipe Generator** - A backend service for generating recipes using Google's Gemini AI
+2. **Next.js Chat Application** - A modern React-based chat interface with task management sidebar
+
+## 🚀 Next.js Chat Application
+
+A beautiful, responsive chat interface built with Next.js, featuring:
+
+### ✨ Features
+- **Real-time chat interface** with message bubbles
+- **Markdown rendering** for rich text messages
+- **Task sidebar** with status indicators (idle/loading/done)
+- **Auto-resizing input** and keyboard shortcuts
+- **Message actions** (copy, export, suggestions)
+- **Responsive design** with custom CSS variables
+- **Dark/light theme support**
+
+### 🛠️ Tech Stack
+- **Framework:** Next.js 16.2.3 with App Router
+- **Language:** TypeScript
+- **Styling:** Custom CSS with CSS Variables
+- **Icons:** SVG icons with hover effects
+
+### 🚀 Running the Chat App
+
+```bash
+cd next-chat-app
+npm install
+npm run dev
+```
+
+Then open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### 📁 Chat App Structure
+```
+next-chat-app/
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx      # Root layout with Inter font
+│   │   ├── page.tsx        # Main chat interface
+│   │   └── globals.css     # Global styles & CSS variables
+│   └── components/
+│       └── TaskSidebar.tsx # Task management sidebar
+├── package.json
+├── next.config.ts
+└── tsconfig.json
+```
+
+---
+
+## 🍳 Genkit Recipe Generator
 
 ## Services & Ports
 
@@ -47,15 +100,52 @@ genkit start -- uv run main.py
 - **Traces API**: `curl http://localhost:4033/api/traces`
 - **Recipe Flow**: Accessible through Developer UI
 
-## File Structure
+## 📁 Project Structure
 
 ```
 genkit-intro/
-├── main.py                 # Main recipe generator flow
-├── pyproject.toml          # Project dependencies
+├── next-chat-app/          # Next.js chat application
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── layout.tsx      # Root layout
+│   │   │   ├── page.tsx        # Chat interface
+│   │   │   └── globals.css     # Global styles
+│   │   └── components/
+│   │       └── TaskSidebar.tsx # Task sidebar component
+│   ├── package.json
+│   └── next.config.ts
+├── main.py                 # Genkit recipe generator flow
+├── pyproject.toml          # Python dependencies
+├── index.html              # Original HTML chat interface
 ├── TELEMETRY_ENDPOINTS.md  # Telemetry API guide
 ├── .env                    # API keys (create this)
 └── .genkit/               # Runtime cache (auto-created)
+```
+
+## 🏃 Running Both Applications
+
+### Option 1: Run Separately
+```bash
+# Terminal 1: Start Genkit backend
+genkit start -- uv run main.py
+
+# Terminal 2: Start Next.js frontend
+cd next-chat-app && npm run dev
+```
+
+### Option 2: Use the Chat App Only
+```bash
+cd next-chat-app
+npm install
+npm run dev
+# Open http://localhost:3000
+```
+
+### Option 3: Use Genkit Only
+```bash
+export GEMINI_API_KEY=your_key
+genkit start -- uv run main.py
+# Open http://localhost:4000
 ```
 
 ## Common Issues
@@ -75,29 +165,67 @@ Kill existing processes:
 ```bash
 pkill -9 genkit
 pkill -9 uv
+# For Next.js
+pkill -f "next dev"
 ```
+
+### Next.js Build Errors
+If you encounter JSX parsing errors:
+```bash
+cd next-chat-app
+rm -rf .next
+npm run dev
+```
+
+## 💬 Chat Application Features
+
+### 🎨 UI Components
+- **Message Bubbles**: User and assistant messages with distinct styling
+- **Task Sidebar**: Collapsible sidebar showing task progress with icons
+- **Auto-resize Input**: Textarea that grows with content
+- **Action Buttons**: Copy, export, and suggestion buttons
+- **Loading States**: Animated thinking indicator and task spinners
+
+### ⌨️ Keyboard Shortcuts
+- **Enter**: Send message (Shift+Enter for new line)
+- **Auto-focus**: Input focuses on load and after sending
+
+### 🎯 Task Management
+- **Status Indicators**: Visual icons for idle/loading/done states
+- **Hover Effects**: Interactive task items with background changes
+- **Time Stamps**: Completion times for finished tasks
 
 ## API Reference
 
-### Get Traces
+### Genkit Telemetry API
+
+#### Get Traces
 ```bash
 GET http://localhost:4033/api/traces
 ```
 Returns JSON with all execution traces.
 
-### Health Check
+#### Health Check
 ```bash
 GET http://localhost:4033/api/__health
 ```
 Returns: `{"status": "OK"}`
 
-## Architecture
+### Chat App Endpoints
+- **Main App**: `http://localhost:3000`
+- **No API endpoints** - client-side only application
+
+## 🏗️ Architecture
 
 ```
-User Browser (localhost:4000)
-    ↓
-Developer UI (Starlette)
-    ↓
+User Browser
+├── Next.js Chat App (localhost:3000)
+│   └── React Components + Task Sidebar
+└── Genkit Developer UI (localhost:4000)
+    └── Recipe Generator Flow
+        └── Gemini AI API
+            └── Telemetry API (localhost:4033)
+```
 Reflection Server (localhost:49xxx)
     ↓
 Main App (main.py) ← Genkit Flow
