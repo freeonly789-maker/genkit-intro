@@ -3,4 +3,8 @@ name = "genkit-intro"
 version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "genkit>=0.5.2",
+    "genkit-plugin-google-genai>=0.5.2",
+    "starlette<1.0.0",
+]

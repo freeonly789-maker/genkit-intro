@@ -1,7 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel, Field
 from genkit import Genkit
-from genkit import Output
 from genkit.plugins.google_genai import GoogleAI
 
 # Initialize Genkit with the Google AI plugin
@@ -25,20 +24,32 @@ class Recipe(BaseModel):
     ingredients: list[str]
     instructions: list[str]
 
-# Define a recipe generator flow
+# Define a recipe generator flow using ai.generate with proper message structure
 @ai.flow()
 async def recipe_generator_flow(input_data: RecipeInput) -> Recipe:
-    # Create a prompt based on the input
-    dietary_restrictions = input_data.dietary_restrictions or 'none'
+    """Generate a recipe based on ingredients and dietary restrictions."""
+    
+    # Create messages in the proper format with system and user content
+    messages = [
+        {
+            'role': 'user',
+            'content': [
+                {
+                    'text': f"""Create a recipe with the following requirements:
+Main ingredient: {input_data.ingredient}
+Dietary restrictions: {input_data.dietary_restrictions or 'none'}
 
-    prompt = f"""Create a recipe with the following requirements:
-        Main ingredient: {input_data.ingredient}
-        Dietary restrictions: {dietary_restrictions}"""
+Return the recipe as JSON."""
+                }
+            ]
+        }
+    ]
 
-    # Generate structured recipe data using the same schema
+    # Generate structured recipe data using the latest Genkit v0.5 API
     result = await ai.generate(
-        prompt=prompt,
-        output=Output(schema=Recipe),
+        messages=messages,
+        output_schema=Recipe,
+        config={'temperature': 0.7}
     )
 
     if not result.output:
@@ -56,4 +67,5 @@ async def main() -> None:
     # Print the structured recipe
     print(recipe.model_dump_json(indent=2))
 
-ai.run_main(main())
+if __name__ == "__main__":
+    ai.run_main(main())
